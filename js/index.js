@@ -32,6 +32,11 @@ let utils = {
       s: date.getSeconds(),
     };
   },
+  getTanDeg: function(tan) {
+    var result = Math.atan(tan) / (Math.PI / 180);
+    result = Math.round(result);
+    return result;
+  },
 };
 let client = {
   width: window.innerWidth,
@@ -112,12 +117,44 @@ class Clock {
       _this.setMinuteHandAngleByTime(timestamp);
       _this.setSecondHandAngleByTime(timestamp);
     });
-    // 给舞台绑定事件
-    // _this.pixiApp.stage.interactive = true;
-    // _this.pixiApp.stage.on('mousemove', ev => {
-    //   //handle event
-    //   console.log(ev);
-    // });
+    // 给canvas绑定事件
+    _this.pixiApp.view.addEventListener('click', ev => {
+      let offset = {
+        x: ev.offsetX / option.pixi.resolution,
+        y: ev.offsetY / option.pixi.resolution,
+      };
+      let angle = utils.getTanDeg((offset.y - option.clock.center.y) / (offset.x - option.clock.center.x));
+      // 根据圆心和鼠标位置计算角度
+      if (offset.y > option.clock.center.y && offset.x > option.clock.center.x) {
+        angle += 0;
+      } else if (offset.y > option.clock.center.y && offset.x < option.clock.center.x) {
+        angle += 180;
+      } else if (offset.y < option.clock.center.y && offset.x < option.clock.center.x) {
+        angle += 180;
+      } else if (offset.y < option.clock.center.y && offset.x > option.clock.center.x) {
+        angle += 360;
+      } else if (offset.y === option.clock.center.y && offset.x < option.clock.center.x) {
+        angle += 180;
+      } else if (offset.y === option.clock.center.y && offset.x > option.clock.center.x) {
+        angle += 0;
+      } else if (offset.y < option.clock.center.y && offset.x === option.clock.center.x) {
+        angle += 360;
+      }
+      // _this.clockScale.transform = new PIXI.Transform({
+      //   scale: new PIXI.ObservablePoint({
+      //     x: 10,
+      //     y: 45
+      //   })
+      // })
+      PIXI.IPoint = {
+        x: 2,
+        y: 2,
+      };
+      console.log(
+        _this.clockScale.rotation = 1
+      );
+      // console.log(new PIXI.Transform());
+    });
   }
   // 创建表盘
   createClockDial() {
