@@ -104,10 +104,12 @@ class Clock {
     _this.secondHand = null; // 秒针
     _this.minuteHand = null; // 分针
     _this.hourHand = null; // 时针
+    _this.hand = null; // 指针组
     _this.pixiApp = new Application(_this.option.pixi);
     document.body.appendChild(_this.pixiApp.view);
     _this.createClockDial();
     _this.createClockScale();
+    _this.createHand();
     _this.createHourHand();
     _this.createMinuteHand();
     _this.createSecondHand();
@@ -141,10 +143,10 @@ class Clock {
       } else if (offset.y < option.clock.center.y && offset.x === option.clock.center.x) {
         angle += 360;
       }
-      console.log(_this.clockScale.euler);
-      _this.clockScale.euler.x = utils.angleToRadian(angle - 180)
-      _this.clockScale.euler.y = utils.angleToRadian(180 - angle);
-      // _this.clockScale.euler.y = -10;
+      _this.clockScale.position3d.x = -(offset.x - option.clock.center.x) * 0.01;
+      _this.clockScale.position3d.y = -(offset.y - option.clock.center.y) * 0.01;
+      _this.hand.position3d.x = (offset.x - option.clock.center.x) * 0.016;
+      _this.hand.position3d.y = (offset.y - option.clock.center.y) * 0.016;
     });
   }
   // 创建表盘
@@ -180,13 +182,19 @@ class Clock {
       _this.clockDial.addChild(_this.clockScale);
     }
   }
+  createHand() {
+    const _this = this;
+    let { option } = _this;
+    _this.hand = new Container3d();
+    _this.pixiApp.stage.addChild(_this.hand);
+  }
   // 创建时针
   createHourHand() {
     const _this = this;
     let { option } = _this;
     // 创建时针组
     _this.hourHand = new Container3d();
-    _this.clockDial.addChild(_this.hourHand);
+    _this.hand.addChild(_this.hourHand);
     _this.hourHand.pivot.set(-option.clock.center.x, -option.clock.center.y);
     let hourHandItem = new Graphics();
     hourHandItem.beginFill(option.clock.hourHand.color);
@@ -211,7 +219,7 @@ class Clock {
     let { option } = _this;
     // 创建分针组
     _this.minuteHand = new Container3d();
-    _this.clockDial.addChild(_this.minuteHand);
+    _this.hand.addChild(_this.minuteHand);
     _this.minuteHand.pivot.set(-option.clock.center.x, -option.clock.center.y);
     let minuteHandItem = new Graphics();
     minuteHandItem.beginFill(option.clock.minuteHand.color);
@@ -236,7 +244,7 @@ class Clock {
     let { option } = _this;
     // 创建秒针组
     _this.secondHand = new Container3d();
-    _this.clockDial.addChild(_this.secondHand);
+    _this.hand.addChild(_this.secondHand);
     _this.secondHand.pivot.set(-option.clock.center.x, -option.clock.center.y);
     let secondHandItem = new Graphics();
     secondHandItem.beginFill(option.clock.secondHand.color);
