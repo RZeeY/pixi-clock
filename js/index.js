@@ -66,18 +66,27 @@ let clockConfig = {
     width: 18,
     height: 160,
     color: 0xffffff,
+    shadow: {
+      color: 0x074e2e
+    }
   },
   // 分针
   minuteHand: {
     width: 18,
     height: 240,
     color: 0xffffff,
+    shadow: {
+      color: 0x074e2e
+    }
   },
-  // 分针
+  // 秒针
   secondHand: {
     width: 8,
     height: 320,
     color: 0xffffff,
+    shadow: {
+      color: 0x074e2e
+    }
   },
 };
 let pixiConfig = {
@@ -119,31 +128,16 @@ class Clock {
       _this.setMinuteHandAngleByTime(timestamp);
       _this.setSecondHandAngleByTime(timestamp);
     });
-    // 给canvas绑定事件
+    // 给canvas绑定mousemove事件
     _this.pixiApp.view.addEventListener('mousemove', ev => {
       let offset = {
         x: ev.offsetX / option.pixi.resolution,
         y: ev.offsetY / option.pixi.resolution,
       };
-      let angle = utils.getTanDeg((offset.y - option.clock.center.y) / (offset.x - option.clock.center.x));
-      // 根据圆心和鼠标位置计算角度
-      if (offset.y > option.clock.center.y && offset.x > option.clock.center.x) {
-        angle += 0;
-      } else if (offset.y > option.clock.center.y && offset.x < option.clock.center.x) {
-        angle += 180;
-      } else if (offset.y < option.clock.center.y && offset.x < option.clock.center.x) {
-        angle += 180;
-      } else if (offset.y < option.clock.center.y && offset.x > option.clock.center.x) {
-        angle += 360;
-      } else if (offset.y === option.clock.center.y && offset.x < option.clock.center.x) {
-        angle += 180;
-      } else if (offset.y === option.clock.center.y && offset.x > option.clock.center.x) {
-        angle += 0;
-      } else if (offset.y < option.clock.center.y && offset.x === option.clock.center.x) {
-        angle += 360;
-      }
+      // 让刻度组根据鼠标和圆心的位置，向鼠标的反方向移动
       _this.clockScale.position3d.x = -(offset.x - option.clock.center.x) * 0.01;
       _this.clockScale.position3d.y = -(offset.y - option.clock.center.y) * 0.01;
+      // 让指针组根据鼠标和圆心的位置，向鼠标的正方向移动
       _this.hand.position3d.x = (offset.x - option.clock.center.x) * 0.016;
       _this.hand.position3d.y = (offset.y - option.clock.center.y) * 0.016;
     });
@@ -164,7 +158,9 @@ class Clock {
     _this.clockScale = new Container3d();
     // 设置刻度组的中心点，即表盘圆心坐标
     _this.clockScale.pivot.set(-option.clock.center.x, -option.clock.center.y);
+    // 循环创建12个刻度矩形
     for (let i = 0; i < 12; i++) {
+      // 创建图形
       let clockScaleItem = new Graphics();
       clockScaleItem.beginFill(option.clock.scale.color);
       clockScaleItem.drawRect(0, 0, option.clock.scale.width, option.clock.scale.height);
@@ -172,16 +168,19 @@ class Clock {
       // 设置每个刻度的中心点位置，以便于按刻度中心旋转
       clockScaleItem.pivot.set(option.clock.scale.width / 2, option.clock.scale.height / 2);
       // 计算刻度坐标
-      // x1   =   x0   +   r   *   cos(ao   *   3.14   /180   )
-      // y1   =   y0   +   r   *   sin(ao   *   3.14   /180   )
+      // x1 = x0 + r * cos(ao * PI / 180)
+      // y1 = y0 + r * sin(ao * PI /180)
       clockScaleItem.position.x = option.clock.radius * Math.cos((Math.PI * i * 30) / 180);
       clockScaleItem.position.y = option.clock.radius * Math.sin((Math.PI * i * 30) / 180);
       // 旋转刻度
       clockScaleItem.rotation = utils.angleToRadian(i * 30 + 90);
+      // 将每个刻度图形添加进刻度组
       _this.clockScale.addChild(clockScaleItem);
-      _this.clockDial.addChild(_this.clockScale);
     }
+    // 将刻度组添加进表盘容器中
+    _this.clockDial.addChild(_this.clockScale);
   }
+  // 创建指针
   createHand() {
     const _this = this;
     let { option } = _this;
@@ -205,7 +204,7 @@ class Clock {
     hourHandItem.rotation = utils.angleToRadian(0);
     // 阴影
     let dropShadowFilter = new PIXI.filters.DropShadowFilter({
-      color: 0x074e2e,
+      color: option.clock.hourHand.shadow.color,
       alpha: 0.65,
       blur: 4,
       distance: 8,
@@ -219,8 +218,10 @@ class Clock {
     let { option } = _this;
     // 创建分针组
     _this.minuteHand = new Container3d();
+    // 将分针组添加进指针组中
     _this.hand.addChild(_this.minuteHand);
     _this.minuteHand.pivot.set(-option.clock.center.x, -option.clock.center.y);
+    // 创建分针图形
     let minuteHandItem = new Graphics();
     minuteHandItem.beginFill(option.clock.minuteHand.color);
     minuteHandItem.drawRect(0, 0, option.clock.minuteHand.width, option.clock.minuteHand.height);
@@ -230,12 +231,13 @@ class Clock {
     minuteHandItem.rotation = utils.angleToRadian(0);
     // 阴影
     let dropShadowFilter = new PIXI.filters.DropShadowFilter({
-      color: 0x074e2e,
+      color: option.clock.minuteHand.shadow.color,
       alpha: 0.5,
       blur: 6,
       distance: 10,
     });
     minuteHandItem.filters = [dropShadowFilter];
+    // 将分针图形添加进分针组中
     _this.minuteHand.addChild(minuteHandItem);
   }
   // 创建秒针
@@ -244,8 +246,10 @@ class Clock {
     let { option } = _this;
     // 创建秒针组
     _this.secondHand = new Container3d();
+    // 将秒针组添加到指针组中
     _this.hand.addChild(_this.secondHand);
     _this.secondHand.pivot.set(-option.clock.center.x, -option.clock.center.y);
+    // 创建指针图形
     let secondHandItem = new Graphics();
     secondHandItem.beginFill(option.clock.secondHand.color);
     secondHandItem.drawRect(0, 0, option.clock.secondHand.width, option.clock.secondHand.height);
@@ -255,12 +259,13 @@ class Clock {
     secondHandItem.rotation = utils.angleToRadian(0);
     // 阴影
     let dropShadowFilter = new PIXI.filters.DropShadowFilter({
-      color: 0x074e2e,
+      color: option.clock.secondHand.shadow.color,
       alpha: 0.5,
       blur: 10,
       distance: 10,
     });
     secondHandItem.filters = [dropShadowFilter];
+    // 将秒针图形添加进秒针组中
     _this.secondHand.addChild(secondHandItem);
   }
   // 根据时间戳设置时针角度
