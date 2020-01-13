@@ -11,7 +11,7 @@
 
 为了方便书写PIXI的方法等，我们先定义一些常量和工具方法
 
-```
+```javascript
 const Application = PIXI.Application;
 const Container = PIXI.Container;
 const Container3d = PIXI.projection.Container3d;
@@ -59,7 +59,7 @@ let utils = {
 
 定义一个“Clock”类，同时创建实例的时候我们给予一个配置参数“option”（用于配置表盘、指针等）。
 
-```
+```javascript
 class Clock {
     constructor(option) {
     }
@@ -83,7 +83,7 @@ class Clock {
 * 根据时间调整分针的角度
 * 根据时间调整秒针的角度
 
-```
+```javascript
 class Clock {
     constructor(option) {
     }
@@ -112,7 +112,8 @@ class Clock {
 
 我们再看看构造函数里我们需要处理的事情。首先我们需要拿到配置项"option"，接着我们应该定义一些属性如表盘的对象、刻度的对象、指针的对象等。并且还要创建PIXI Application的实例。<br/>
 以上步骤完成后我们再依次创建表盘、刻度、指针、时针、分针、秒针。
-```
+
+```javascript
 class Clock {
     constructor(option) {
         const _this = this;
@@ -141,7 +142,7 @@ class Clock {
 
 这一步用于创建表盘容器，表盘容器里面包括刻度、指针、时针、分针、秒针等5个组。
 
-```
+```javascript
 class Clock {
     constructor(option) {
         const _this = this;
@@ -161,7 +162,7 @@ class Clock {
 <br />
 在已知半径r，圆心坐标x0、y0，角度angle的情况下，可采用 ```x1 = x0 + r * cos(ao * PI / 180)``` 和 ```y1 = y0 + r * sin(ao * PI /180)``` 计算出每个刻度所处的x和y坐标。
 
-```
+```javascript
 class Clock {
     // ...
     // 创建刻度
@@ -202,7 +203,7 @@ class Clock {
 
 创建指针组，并添加到舞台中
 
-```
+```javascript
 class Clock {
     // ...
     // 创建指针
@@ -218,7 +219,7 @@ class Clock {
 
 #### 3.5 创建时针 createHourHand
 
-```
+```javascript
 class Clock {
     // ...
     // 创建时针
@@ -252,7 +253,7 @@ class Clock {
 
 #### 3.6 创建分针 createMinuteHand
 
-```
+```javascript
 class Clock {
     // ...
     // 创建分针
@@ -289,7 +290,7 @@ class Clock {
 
 #### 3.7 创建秒针 createSecondHand
 
-```
+```javascript
 class Clock {
     // ...
     // 创建秒针
@@ -328,7 +329,7 @@ class Clock {
 
 我们以时针为例。首先时针不是一直都的对准某一刻度的，比如2:30，时针就指向了2点和1点的中间，所以我们要将整数“时”转换为小数“时”。比如2:30就是2.5时。我们采用 ```h = h + (5 * m) / 3 / 100``` 这样的公式转换小数。再通过Container对象的rotation属性设置当前时针所处的角度。
 
-```
+```javascript
 class Clock {
     // ...
     // 根据时间戳设置时针角度
@@ -374,7 +375,7 @@ class Clock {
 <br />
 在ticker.add的每次一回调函数中都获取一次当前时间戳，并通过时间戳更改时分秒的指针角度。
 
-```
+```javascript
 class Clock {
     constructor(option) {
         // ...
@@ -393,7 +394,7 @@ class Clock {
 
 ### 5. 最后再添加一个视差效果！
 
-```
+```javascript
 class Clock {
     constructor(option) {
         // ...
