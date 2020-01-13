@@ -105,7 +105,7 @@ class Clock {
     _this.minuteHand = null; // 分针
     _this.hourHand = null; // 时针
     _this.hand = null; // 指针组
-    _this.pixiApp = new Application(_this.option.pixi);
+    _this.pixiApp = new Application(_this.option.pixi); // 根据option中pixi的配置来创建PIXI Application的实例
     document.body.appendChild(_this.pixiApp.view);
     _this.createClockDial();
     _this.createClockScale();
@@ -113,7 +113,6 @@ class Clock {
     _this.createHourHand();
     _this.createMinuteHand();
     _this.createSecondHand();
-    // Start the game loop
     _this.pixiApp.ticker.add(delta => {
       let timestamp = new Date().getTime();
       _this.setHourHandAngleByTime(timestamp);
@@ -154,6 +153,7 @@ class Clock {
     const _this = this;
     // 创建表盘组
     _this.clockDial = new Container3d();
+    // 将表盘组添加到舞台中
     _this.pixiApp.stage.addChild(_this.clockDial);
   }
   // 创建刻度
